@@ -1,0 +1,1 @@
+"""Basit harcama takip aracı."""
