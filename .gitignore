@@ -1,0 +1,17 @@
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+
+# Editörler
+.idea/
+.vscode/
+*.swp
+
+# Ortam ve yerel ayarlar
+.env
+.env.*
+
+# Derleme / önbellek çıktıları
+build/
+dist/
+*.log
