@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from typing import List, Optional
 
-from harcama_takip.veri import Depo, HarcamaHatasi, ay_dogrula
+from harcama_takip.veri import Depo, Harcama, HarcamaHatasi, ay_dogrula
 
 DESTEKLENEN_BICIMLER = ("csv",)
 CSV_BASLIKLARI = ["id", "tarih", "kategori", "tutar", "aciklama"]
@@ -86,6 +86,28 @@ def rapor_metni(rapor: AylikRapor) -> str:
             "GENEL TOPLAM", kurus_metni(rapor.genel_toplam_kurus), "100.00", g=genislik
         )
     )
+    return "\n".join(satirlar)
+
+
+def liste_metni(harcamalar: List[Harcama]) -> str:
+    """Harcama listesini terminalde gösterilecek tablo metnine çevirir."""
+    if not harcamalar:
+        return "Kayıt bulunamadı."
+    id_g = max(len("ID"), *(len(str(h.id)) for h in harcamalar))
+    kat_g = max(len("Kategori"), *(len(h.kategori) for h in harcamalar))
+    satirlar = [
+        "{:>{i}}  {:<10}  {:<{k}}  {:>12}  {}".format(
+            "ID", "Tarih", "Kategori", "Tutar", "Açıklama", i=id_g, k=kat_g
+        )
+    ]
+    for h in harcamalar:
+        satirlar.append(
+            "{:>{i}}  {:<10}  {:<{k}}  {:>12}  {}".format(
+                h.id, h.tarih, h.kategori, kurus_metni(h.tutar_kurus), h.aciklama, i=id_g, k=kat_g
+            ).rstrip()
+        )
+    toplam = sum(h.tutar_kurus for h in harcamalar)
+    satirlar.append("Toplam: {} ({} kayıt)".format(kurus_metni(toplam), len(harcamalar)))
     return "\n".join(satirlar)
 
 
