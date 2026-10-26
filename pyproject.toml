@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "harcama-takip"
+version = "0.1.0"
+description = "SQLite tabanlı komut satırı harcama takip uygulaması."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = []
+
+[project.scripts]
+harcama-takip = "harcama_takip.cli:main"
+
+[tool.setuptools]
+packages = ["harcama_takip"]

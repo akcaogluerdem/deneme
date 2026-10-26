@@ -99,5 +99,10 @@ def ana(
     return 0
 
 
+def main(argv: Optional[List[str]] = None) -> int:
+    """pyproject.toml'daki `harcama-takip` konsol betiğinin hedefi."""
+    return ana(argv)
+
+
 if __name__ == "__main__":
-    sys.exit(ana())
+    sys.exit(main())
