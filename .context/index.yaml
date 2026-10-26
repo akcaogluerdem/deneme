@@ -1,0 +1,13 @@
+proje: deneme
+surum: 1
+dil: belirsiz
+aciklama: Dilden bağımsız asgari proje iskeleti.
+dosyalar:
+  - yol: README.md
+    rol: proje tanımı ve kullanım
+  - yol: Makefile
+    rol: proje komutları (help, check, clean)
+  - yol: .gitignore
+    rol: sürüm denetimi dışı dosyalar
+komutlar:
+  dogrulama: make check
