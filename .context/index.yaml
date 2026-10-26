@@ -1,0 +1,10 @@
+proje: harcama
+dil: python
+paket_yoneticisi: yok (yalnızca standart kütüphane)
+komutlar:
+  test: make test
+  calistir: python3 -m harcama
+dosyalar:
+  harcama/cli.py: argparse tabanlı CLI (add, list, report) ve rapor hesabı
+  harcama/__main__.py: python -m harcama giriş noktası
+  tests/test_report.py: report komutu testleri
