@@ -1,0 +1,11 @@
+proje: harcama
+dil: python
+bagimliliklar: []
+komutlar:
+  test: make test
+moduller:
+  harcama/para.py: "Kuruş (int) tabanlı tutar ayrıştırma, toplama ve biçimleme; float kullanılmaz."
+testler:
+  - tests/test_para.py
+kurallar:
+  - "Tutarlar her zaman tam sayı kuruş olarak tutulur; float kabul edilmez."
