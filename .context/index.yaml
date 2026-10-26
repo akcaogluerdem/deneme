@@ -1,0 +1,15 @@
+proje: harcama
+aciklama: Komut satırından harcama kaydı ve ay/kategori filtreli listeleme aracı.
+dil: python
+surum: "3.9+"
+bagimliliklar: []  # yalnızca standart kütüphane
+komutlar:
+  test: make test
+  calistir: python3 -m harcama list
+dosyalar:
+  harcama/cli.py: argparse arayüzü; `ekle` ve `list` (--ay YYYY-AA, --kategori) alt komutları
+  harcama/__main__.py: `python3 -m harcama` giriş noktası
+  tests/test_cli.py: filtreleme ve CLI birim testleri (unittest)
+veri:
+  dosya: harcamalar.json  # --dosya ya da HARCAMA_DOSYA ile değiştirilebilir
+  kayit: {tarih: YYYY-AA-GG, tutar: float, kategori: str, aciklama: str}
