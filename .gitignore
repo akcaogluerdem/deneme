@@ -1,0 +1,16 @@
+# Derleme çıktıları
+build/
+dist/
+
+# Ortam ve gizli bilgiler
+.env
+.env.*
+
+# Editör / işletim sistemi
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Günlükler
+*.log
