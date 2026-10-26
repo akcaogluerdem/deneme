@@ -1,0 +1,20 @@
+proje: harcama
+aciklama: Komut satırı harcama takipçisi (add komutu)
+dil: python
+surum: ">=3.9"
+bagimliliklar: []
+komutlar:
+  test: make test
+  calistir: python3 -m harcama add --tutar 150.50 --kategori market
+dosyalar:
+  - yol: harcama/cli.py
+    rol: argparse tabanlı CLI ve JSON depolama
+  - yol: harcama/__main__.py
+    rol: "python -m harcama" giriş noktası
+  - yol: tests/test_cli.py
+    rol: unittest birim testleri
+  - yol: Makefile
+    rol: test / run / clean hedefleri
+veri:
+  dosya: harcamalar.json
+  ortam_degiskeni: HARCAMA_DOSYASI
