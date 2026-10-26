@@ -1,0 +1,19 @@
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+
+# Editörler
+.idea/
+.vscode/
+*.swp
+*~
+
+# Derleme ve geçici çıktılar
+build/
+dist/
+tmp/
+*.log
+
+# Ortam değişkenleri
+.env
+.env.*
