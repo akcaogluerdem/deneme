@@ -1,0 +1,9 @@
+repo: akcaogluerdem/deneme
+dil: bilinmiyor
+paket_yoneticisi: bilinmiyor
+dogrulama:
+  komut: make check
+dosyalar:
+  - README.md
+  - Makefile
+  - .gitignore
