@@ -10,7 +10,7 @@ import re
 import sqlite3
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 DB_ORTAM_DEGISKENI = "HARCAMA_TAKIP_DB"
 VARSAYILAN_DB_ADI = ".harcama_takip.db"
@@ -158,6 +158,15 @@ class Depo:
             sorgu += " WHERE " + " AND ".join(kosullar)
         sorgu += " ORDER BY tarih, id"
         return [Harcama(*satir) for satir in self._baglanti.execute(sorgu, parametreler)]
+
+    def kategori_toplamlari(self, ay: str) -> List[Tuple[str, int]]:
+        """Verilen aydaki kategori toplamlarını (kuruş) büyükten küçüğe döndürür."""
+        sorgu = (
+            "SELECT kategori, SUM(tutar_kurus) AS toplam FROM harcamalar"
+            " WHERE substr(tarih, 1, 7) = ?"
+            " GROUP BY kategori ORDER BY toplam DESC, kategori"
+        )
+        return [(k, int(t)) for k, t in self._baglanti.execute(sorgu, (ay_dogrula(ay),))]
 
     def sil(self, harcama_id: int) -> None:
         try:
