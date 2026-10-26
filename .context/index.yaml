@@ -1,0 +1,14 @@
+proje: akcaogluerdem/deneme
+aciklama: Yeni proje iskeleti; dil ve çatı henüz seçilmedi.
+dil: belirlenmedi
+dosyalar:
+  - yol: README.md
+    amac: Kurulum ve çalıştırma talimatları
+  - yol: Makefile
+    amac: setup, run, check ve clean hedefleri
+  - yol: .gitignore
+    amac: Sürüm denetimine girmeyecek dosyalar
+komutlar:
+  kurulum: make setup
+  calistirma: make run
+  dogrulama: make check
