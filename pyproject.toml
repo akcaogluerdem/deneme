@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "harcama-takip"
+version = "0.1.0"
+description = "Python ile SQLite tabanlı komut satırı harcama takip uygulaması"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["harcama_takip*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
