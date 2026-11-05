@@ -6,10 +6,11 @@ import argparse
 import csv
 import sys
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, TextIO
 
 from harcama_takip.rapor import aylik_rapor, rapor_metni
 from harcama_takip.veri import (
+    Harcama,
     HarcamaHatasi,
     Veritabani,
     ay_dogrula,
@@ -53,6 +54,14 @@ def ayristirici_olustur() -> argparse.ArgumentParser:
     return ana
 
 
+def csv_akisa_yaz(kayitlar: Sequence[Harcama], akis: TextIO) -> None:
+    """Başlık ve kayıt satırlarını verilen metin akışına CSV olarak yazar."""
+    yazici = csv.writer(akis)
+    yazici.writerow(["id", "tarih", "kategori", "tutar", "aciklama"])
+    for k in kayitlar:
+        yazici.writerow([k.id, k.tarih, k.kategori, kurus_metni(k.tutar_kurus), k.aciklama])
+
+
 def csv_yaz(veritabani: Veritabani, dosya: str) -> int:
     """Tüm harcamaları CSV dosyasına yazar; yazılan kayıt sayısını döndürür."""
     kayitlar = veritabani.listele()
@@ -60,10 +69,7 @@ def csv_yaz(veritabani: Veritabani, dosya: str) -> int:
     if yol.parent and not yol.parent.exists():
         raise HarcamaHatasi(f"Çıktı klasörü bulunamadı: {yol.parent}")
     with yol.open("w", newline="", encoding="utf-8") as f:
-        yazici = csv.writer(f)
-        yazici.writerow(["id", "tarih", "kategori", "tutar", "aciklama"])
-        for k in kayitlar:
-            yazici.writerow([k.id, k.tarih, k.kategori, kurus_metni(k.tutar_kurus), k.aciklama])
+        csv_akisa_yaz(kayitlar, f)
     return len(kayitlar)
 
 
