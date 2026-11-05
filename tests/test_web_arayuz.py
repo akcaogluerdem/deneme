@@ -1,4 +1,5 @@
 import json
+import re
 import threading
 import urllib.error
 import urllib.request
@@ -42,6 +43,29 @@ def test_api_uclarina_baglanir(adres):
     govde = _al(adres + "/")[2]
     for parca in ("/api/harcamalar", "/api/rapor", "/export.csv"):
         assert parca in govde
+
+
+def test_ozet_kartlari_var(adres):
+    govde = _al(adres + "/")[2]
+    for kimlik in ("ozet-toplam", "ozet-adet", "ozet-kategori", "ozet-ay"):
+        assert 'id="%s"' % kimlik in govde
+    assert govde.count('class="ozet-kart') == 3
+
+
+def test_kategori_renk_paleti(adres):
+    govde = _al(adres + "/")[2]
+    eslesme = re.search(r"PALET=\[([^\]]*)\]", govde)
+    assert eslesme is not None
+    assert eslesme.group(1).count("#") == 8
+    assert "function kategoriRenk(" in govde
+    assert "kategori-renk" in govde
+
+
+def test_tema_tokenlari_ve_cubuk(adres):
+    govde = _al(adres + "/")[2]
+    assert ":root{" in govde
+    assert "--vurgu:" in govde and "--tehlike:" in govde
+    assert 'class="cubuk"' in govde or '"cubuk"' in govde
 
 
 def test_bilinmeyen_yol_404_json(adres):
