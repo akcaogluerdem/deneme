@@ -48,40 +48,81 @@ SAYFA_HTML = """<!DOCTYPE html>
 <meta name="color-scheme" content="light dark">
 <title>Harcama Takip</title>
 <style>
-:root{--bg:#f6f7f9;--kart:#fff;--yazi:#1c1e21;--soluk:#667085;--cizgi:#d9dde3;--vurgu:#2563eb;--tehlike:#c62828}
-@media (prefers-color-scheme: dark){:root{--bg:#14161a;--kart:#1e2127;--yazi:#e8eaed;--soluk:#9aa3b2;--cizgi:#343a45;--vurgu:#6ea0ff;--tehlike:#ef6b6b}}
-html[data-tema="koyu"]{--bg:#14161a;--kart:#1e2127;--yazi:#e8eaed;--soluk:#9aa3b2;--cizgi:#343a45;--vurgu:#6ea0ff;--tehlike:#ef6b6b}
-html[data-tema="açık"]{--bg:#f6f7f9;--kart:#fff;--yazi:#1c1e21;--soluk:#667085;--cizgi:#d9dde3;--vurgu:#2563eb;--tehlike:#c62828}
+:root{--bg:#f6f7f9;--kart:#fff;--yazi:#1c1e21;--soluk:#667085;--cizgi:#d9dde3;--vurgu:#2563eb;--vurgu-koyu:#1d4ed8;--uzerine:#fff;--tehlike:#c62828;--ok:#15803d;--hata-bg:#fdecec;--zebra:#f4f6fa;--hover:#e6eeff;--bas:#7c3aed;--son:#2563eb}
+@media (prefers-color-scheme: dark){:root{--bg:#14161a;--kart:#1e2127;--yazi:#e8eaed;--soluk:#9aa3b2;--cizgi:#343a45;--vurgu:#6ea0ff;--vurgu-koyu:#8fb6ff;--uzerine:#0b1020;--tehlike:#ef6b6b;--ok:#22a06b;--hata-bg:#3a1f22;--zebra:#191c22;--hover:#263047;--bas:#7c3aed;--son:#2563eb}}
+html[data-tema="koyu"]{--bg:#14161a;--kart:#1e2127;--yazi:#e8eaed;--soluk:#9aa3b2;--cizgi:#343a45;--vurgu:#6ea0ff;--vurgu-koyu:#8fb6ff;--uzerine:#0b1020;--tehlike:#ef6b6b;--ok:#22a06b;--hata-bg:#3a1f22;--zebra:#191c22;--hover:#263047;--bas:#7c3aed;--son:#2563eb}
+html[data-tema="açık"]{--bg:#f6f7f9;--kart:#fff;--yazi:#1c1e21;--soluk:#667085;--cizgi:#d9dde3;--vurgu:#2563eb;--vurgu-koyu:#1d4ed8;--uzerine:#fff;--tehlike:#c62828;--ok:#15803d;--hata-bg:#fdecec;--zebra:#f4f6fa;--hover:#e6eeff;--bas:#7c3aed;--son:#2563eb}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--yazi)}
-header,main{max-width:960px;margin:0 auto;padding:12px 16px}
-header{display:flex;justify-content:space-between;align-items:center}
-h1{font-size:1.4rem;margin:0}
-section{background:var(--kart);border:1px solid var(--cizgi);border-radius:10px;padding:14px;margin-bottom:16px}
-h2{font-size:1.1rem;margin:0 0 10px}
+header.ust{background:linear-gradient(135deg,var(--bas),var(--son));color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.ust-ic{max-width:960px;margin:0 auto;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ust h1{font-size:1.5rem;margin:0;color:#fff}
+.alt{margin:2px 0 0;font-size:.9rem;opacity:.9}
+header.ust button.ikincil{background:rgba(255,255,255,.15);color:#fff;border-color:#fff}
+header.ust button.ikincil:hover{background:rgba(255,255,255,.28);color:#fff;border-color:#fff}
+main{max-width:960px;margin:0 auto;padding:12px 16px}
+.ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0 16px}
+.ozet-kart{color:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.ozet-kart .etiket{font-size:.8rem;opacity:.9;text-transform:uppercase;letter-spacing:.04em}
+.ozet-kart .deger{font-size:1.4rem;font-weight:700;margin-top:4px;word-break:break-word}
+.o-mavi{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+.o-yesil{background:linear-gradient(135deg,#16a34a,#15803d)}
+.o-turuncu{background:linear-gradient(135deg,#ea580c,#c2410c)}
+section{background:var(--kart);border:1px solid var(--cizgi);border-top:4px solid var(--vurgu);border-radius:12px;padding:14px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+section.tablo-kart{border-top-color:var(--ok)}
+section.rapor-kart{border-top-color:#b45309}
+h2{font-size:1.1rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--vurgu);flex:none}
+section.tablo-kart h2::before{background:var(--ok)}
+section.rapor-kart h2::before{background:#b45309}
 form,.filtre{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end}
-label{display:flex;flex-direction:column;font-size:.85rem;color:var(--soluk);gap:3px}
-input,button{font:inherit;padding:8px;border-radius:6px;border:1px solid var(--cizgi);background:var(--bg);color:var(--yazi)}
-button{background:var(--vurgu);color:#fff;border-color:var(--vurgu);cursor:pointer}
+label{display:flex;flex-direction:column;font-size:.85rem;color:var(--soluk);gap:3px;font-weight:500}
+input,button,a.dugme{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--cizgi);background:var(--bg);color:var(--yazi)}
+input:focus{outline:none;border-color:var(--vurgu);box-shadow:0 0 0 3px rgba(37,99,235,.25)}
+button{background:var(--vurgu);color:var(--uzerine);border-color:var(--vurgu);cursor:pointer;font-weight:600;transition:background .15s,color .15s}
+button:hover{background:var(--vurgu-koyu);border-color:var(--vurgu-koyu)}
+button:focus-visible,a.dugme:focus-visible,input:focus-visible{outline:3px solid var(--vurgu);outline-offset:2px}
 button.ikincil{background:transparent;color:var(--vurgu)}
+button.ikincil:hover{background:var(--hover);color:var(--vurgu);border-color:var(--vurgu)}
 button.sil{background:transparent;color:var(--tehlike);border-color:var(--tehlike);padding:4px 8px}
+button.sil:hover{background:var(--tehlike);color:#fff;border-color:var(--tehlike)}
+a.dugme{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border:1px solid var(--vurgu);color:var(--vurgu);text-decoration:none;font-weight:600;background:transparent}
+a.dugme:hover{background:var(--hover)}
 table{width:100%;border-collapse:collapse}
-th,td{text-align:left;padding:6px;border-bottom:1px solid var(--cizgi);font-size:.92rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--cizgi);font-size:.92rem;vertical-align:middle}
+th{color:var(--soluk);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.03em}
 td.sayi,th.sayi{text-align:right}
+td.tutar{font-weight:700;font-variant-numeric:tabular-nums}
+tbody tr:nth-child(even){background:var(--zebra)}
+tbody tr:hover{background:var(--hover)}
 .tablo{overflow-x:auto}
-#mesaj{min-height:1.2em;color:var(--tehlike);margin:0 0 8px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;color:#fff;font-size:.8rem;font-weight:600;white-space:nowrap}
+.cubuk{height:6px;background:var(--cizgi);border-radius:4px;margin-top:6px;overflow:hidden;min-width:80px}
+.cubuk span{display:block;height:100%;border-radius:4px}
+#mesaj{margin:0 0 8px;color:var(--tehlike);background:var(--hata-bg);border:1px solid var(--tehlike);border-radius:8px;padding:8px 12px}
+#mesaj:empty{display:none}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,16px);background:var(--ok);color:#fff;padding:10px 18px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;font-weight:600}
+.toast.gorunur{opacity:1;transform:translate(-50%,0)}
 .bos{color:var(--soluk)}
 a{color:var(--vurgu)}
-@media (max-width:480px){header{flex-direction:column;align-items:flex-start;gap:6px}}
+@media (max-width:600px){.ozet,form,.filtre{grid-template-columns:1fr}.ust-ic{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
-<header>
-<h1>Harcama Takip</h1>
+<header class="ust">
+<div class="ust-ic">
+<div><h1>Harcama Takip</h1><p class="alt">Harcamalarını kaydet, kategorilere göre izle</p></div>
 <button type="button" id="tema" class="ikincil">Tema: otomatik</button>
+</div>
 </header>
 <main>
+<div class="ozet" aria-label="Özet">
+<div class="ozet-kart o-mavi"><div class="etiket">Aylık toplam (<span id="ozet-ay">—</span>)</div><div class="deger" id="ozet-toplam">—</div></div>
+<div class="ozet-kart o-yesil"><div class="etiket">Kayıt sayısı</div><div class="deger" id="ozet-adet">—</div></div>
+<div class="ozet-kart o-turuncu"><div class="etiket">En çok harcanan kategori</div><div class="deger" id="ozet-kategori">—</div></div>
+</div>
 <p id="mesaj" role="alert"></p>
+<div id="bildirim" class="toast" role="status"></div>
 <section>
 <h2>Yeni harcama</h2>
 <form id="ekle-formu">
@@ -92,13 +133,13 @@ a{color:var(--vurgu)}
 <button type="submit">Ekle</button>
 </form>
 </section>
-<section>
+<section class="tablo-kart">
 <h2>Harcamalar</h2>
 <div class="filtre">
 <label>Ay<input id="f-ay" type="month"></label>
 <label>Kategori<input id="f-kategori" placeholder="tümü"></label>
 <button type="button" id="filtrele">Filtrele</button>
-<a id="csv" href="/export.csv" download="harcamalar.csv">CSV dışa aktar</a>
+<a id="csv" class="dugme" href="/export.csv" download="harcamalar.csv">CSV dışa aktar</a>
 </div>
 <div class="tablo">
 <table>
@@ -107,7 +148,7 @@ a{color:var(--vurgu)}
 </table>
 </div>
 </section>
-<section>
+<section class="rapor-kart">
 <h2>Aylık rapor</h2>
 <p class="bos" id="rapor-ozet">Rapor için yukarıdan bir ay seçin.</p>
 <div class="tablo">
@@ -129,6 +170,11 @@ async function istek(url,secenek){
   if(!y.ok)throw new Error(v.hata||"İstek başarısız.");
   return v;
 }
+var PALET=["#2563eb","#15803d","#b45309","#7e22ce","#be185d","#0e7490","#4d7c0f","#c2410c"];
+function kategoriRenk(ad){var h=0;for(var i=0;i<ad.length;i++){h=(h*31+ad.charCodeAt(i))>>>0;}return PALET[h%PALET.length];}
+function kategoriHucre(tr,ad){var td=document.createElement("td");var s=document.createElement("span");s.className="pill kategori-renk";s.textContent=ad;s.style.background=kategoriRenk(ad);td.appendChild(s);tr.appendChild(td);return td;}
+var bildirimZamanlayici=null;
+function basari(m){var b=$("bildirim");b.textContent=m;b.classList.add("gorunur");clearTimeout(bildirimZamanlayici);bildirimZamanlayici=setTimeout(function(){b.classList.remove("gorunur");},2500);}
 function sorgu(){
   var p=new URLSearchParams();
   if($("f-ay").value)p.set("ay",$("f-ay").value);
@@ -146,7 +192,7 @@ async function listele(){
     }
     v.harcamalar.forEach(function(h){
       var tr=document.createElement("tr");
-      hucre(tr,h.tarih);hucre(tr,h.kategori);hucre(tr,h.aciklama||"");hucre(tr,h.tutar,"sayi");
+hucre(tr,h.tarih);kategoriHucre(tr,h.kategori);hucre(tr,h.aciklama||"");hucre(tr,h.tutar,"sayi tutar");
       var son=document.createElement("td");var b=document.createElement("button");
       b.type="button";b.className="sil";b.textContent="Sil";
       b.addEventListener("click",function(){sil(h.id);});
@@ -154,7 +200,8 @@ async function listele(){
     });
     mesaj("");
   }catch(e){mesaj(e.message);}
-  rapor();
+rapor();
+  ozet();
 }
 async function rapor(){
   var gov=$("rapor");gov.textContent="";
@@ -165,8 +212,22 @@ async function rapor(){
     $("rapor-ozet").textContent=r.ay+" genel toplam: "+r.genel_toplam;
     r.satirlar.forEach(function(s){
       var tr=document.createElement("tr");
-      hucre(tr,s.kategori);hucre(tr,s.tutar,"sayi");hucre(tr,"%"+s.yuzde,"sayi");gov.appendChild(tr);
+var td=kategoriHucre(tr,s.kategori);var c=document.createElement("div");c.className="cubuk";var b=document.createElement("span");b.style.width=Math.min(100,Math.max(0,parseFloat(s.yuzde)||0))+"%";b.style.background=kategoriRenk(s.kategori);c.appendChild(b);td.appendChild(c);hucre(tr,s.tutar,"sayi tutar");hucre(tr,"%"+s.yuzde,"sayi");gov.appendChild(tr);
     });
+  }catch(e){mesaj(e.message);}
+}
+async function ozet(){
+  var ay=$("f-ay").value;
+  if(!ay){var d=new Date();ay=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
+  $("ozet-ay").textContent=ay;
+  try{
+    var r=await istek("/api/rapor?ay="+encodeURIComponent(ay));
+    var h=await istek("/api/harcamalar?ay="+encodeURIComponent(ay));
+    var en=null;
+    r.satirlar.forEach(function(s){if(!en||s.tutar_kurus>en.tutar_kurus)en=s;});
+    $("ozet-toplam").textContent=r.genel_toplam;
+    $("ozet-adet").textContent=String(h.harcamalar.length);
+    $("ozet-kategori").textContent=en?en.kategori:"—";
   }catch(e){mesaj(e.message);}
 }
 async function sil(id){
@@ -180,7 +241,7 @@ $("ekle-formu").addEventListener("submit",async function(o){
   f.forEach(function(d,k){if(String(d).trim()!=="")g[k]=String(d).trim();});
   try{
     await istek("/api/harcamalar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(g)});
-    o.target.reset();listele();
+o.target.reset();basari("Harcama eklendi.");listele();
   }catch(e){mesaj(e.message);}
 });
 $("filtrele").addEventListener("click",listele);
