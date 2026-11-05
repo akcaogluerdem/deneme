@@ -68,6 +68,27 @@ def test_tema_tokenlari_ve_cubuk(adres):
     assert 'class="cubuk"' in govde or '"cubuk"' in govde
 
 
+def test_tasarim_tokenlari_ve_palet(adres):
+    govde = _al(adres + "/")[2]
+    assert "#4338CA" in govde
+    assert "--birincil:" in govde and "--hata:" in govde
+    eslesme = re.search(r"PALET=\[([^\]]*)\]", govde)
+    assert eslesme is not None
+    assert eslesme.group(1).count("#") == 8
+
+
+def test_tasarim_kararli_idler(adres):
+    govde = _al(adres + "/")[2]
+    for kimlik in ("harcama-tablo", "dagilim-yigin", "sil-diyalog", "ozet-kategori", "ozet-toplam"):
+        assert 'id="%s"' % kimlik in govde
+    assert "<dialog" in govde
+
+
+def test_linear_gradient_yok(adres):
+    govde = _al(adres + "/")[2]
+    assert "linear-gradient" not in govde
+
+
 def test_bilinmeyen_yol_404_json(adres):
     with pytest.raises(urllib.error.HTTPError) as e:
         _al(adres + "/yok")
