@@ -40,6 +40,169 @@ VARSAYILAN_HOST = "127.0.0.1"
 VARSAYILAN_PORT = 8000
 EN_BUYUK_GOVDE = 64 * 1024  # bayt
 
+SAYFA_HTML = """<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Harcama Takip</title>
+<style>
+:root{--bg:#f6f7f9;--kart:#fff;--yazi:#1c1e21;--soluk:#667085;--cizgi:#d9dde3;--vurgu:#2563eb;--tehlike:#c62828}
+@media (prefers-color-scheme: dark){:root{--bg:#14161a;--kart:#1e2127;--yazi:#e8eaed;--soluk:#9aa3b2;--cizgi:#343a45;--vurgu:#6ea0ff;--tehlike:#ef6b6b}}
+html[data-tema="koyu"]{--bg:#14161a;--kart:#1e2127;--yazi:#e8eaed;--soluk:#9aa3b2;--cizgi:#343a45;--vurgu:#6ea0ff;--tehlike:#ef6b6b}
+html[data-tema="açık"]{--bg:#f6f7f9;--kart:#fff;--yazi:#1c1e21;--soluk:#667085;--cizgi:#d9dde3;--vurgu:#2563eb;--tehlike:#c62828}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--yazi)}
+header,main{max-width:960px;margin:0 auto;padding:12px 16px}
+header{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:1.4rem;margin:0}
+section{background:var(--kart);border:1px solid var(--cizgi);border-radius:10px;padding:14px;margin-bottom:16px}
+h2{font-size:1.1rem;margin:0 0 10px}
+form,.filtre{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end}
+label{display:flex;flex-direction:column;font-size:.85rem;color:var(--soluk);gap:3px}
+input,button{font:inherit;padding:8px;border-radius:6px;border:1px solid var(--cizgi);background:var(--bg);color:var(--yazi)}
+button{background:var(--vurgu);color:#fff;border-color:var(--vurgu);cursor:pointer}
+button.ikincil{background:transparent;color:var(--vurgu)}
+button.sil{background:transparent;color:var(--tehlike);border-color:var(--tehlike);padding:4px 8px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:6px;border-bottom:1px solid var(--cizgi);font-size:.92rem}
+td.sayi,th.sayi{text-align:right}
+.tablo{overflow-x:auto}
+#mesaj{min-height:1.2em;color:var(--tehlike);margin:0 0 8px}
+.bos{color:var(--soluk)}
+a{color:var(--vurgu)}
+@media (max-width:480px){header{flex-direction:column;align-items:flex-start;gap:6px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Harcama Takip</h1>
+<button type="button" id="tema" class="ikincil">Tema: otomatik</button>
+</header>
+<main>
+<p id="mesaj" role="alert"></p>
+<section>
+<h2>Yeni harcama</h2>
+<form id="ekle-formu">
+<label>Tutar (TL)<input name="tutar" required inputmode="decimal" placeholder="150.50"></label>
+<label>Kategori<input name="kategori" required placeholder="market"></label>
+<label>Tarih<input name="tarih" type="date"></label>
+<label>Açıklama<input name="aciklama" placeholder="isteğe bağlı"></label>
+<button type="submit">Ekle</button>
+</form>
+</section>
+<section>
+<h2>Harcamalar</h2>
+<div class="filtre">
+<label>Ay<input id="f-ay" type="month"></label>
+<label>Kategori<input id="f-kategori" placeholder="tümü"></label>
+<button type="button" id="filtrele">Filtrele</button>
+<a id="csv" href="/export.csv" download="harcamalar.csv">CSV dışa aktar</a>
+</div>
+<div class="tablo">
+<table>
+<thead><tr><th>Tarih</th><th>Kategori</th><th>Açıklama</th><th class="sayi">Tutar</th><th></th></tr></thead>
+<tbody id="liste"></tbody>
+</table>
+</div>
+</section>
+<section>
+<h2>Aylık rapor</h2>
+<p class="bos" id="rapor-ozet">Rapor için yukarıdan bir ay seçin.</p>
+<div class="tablo">
+<table>
+<thead><tr><th>Kategori</th><th class="sayi">Tutar</th><th class="sayi">Yüzde</th></tr></thead>
+<tbody id="rapor"></tbody>
+</table>
+</div>
+</section>
+</main>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+function mesaj(m){$("mesaj").textContent=m||"";}
+function hucre(tr,metin,sinif){var td=document.createElement("td");td.textContent=metin;if(sinif)td.className=sinif;tr.appendChild(td);return td;}
+async function istek(url,secenek){
+  var y=await fetch(url,secenek);var v=await y.json();
+  if(!y.ok)throw new Error(v.hata||"İstek başarısız.");
+  return v;
+}
+function sorgu(){
+  var p=new URLSearchParams();
+  if($("f-ay").value)p.set("ay",$("f-ay").value);
+  if($("f-kategori").value.trim())p.set("kategori",$("f-kategori").value.trim());
+  return p.toString();
+}
+async function listele(){
+  try{
+    var q=sorgu();
+    $("csv").href="/export.csv"+(q?"?"+q:"");
+    var v=await istek("/api/harcamalar"+(q?"?"+q:""));
+    var gov=$("liste");gov.textContent="";
+    if(!v.harcamalar.length){
+      var t=document.createElement("tr");var d=hucre(t,"Kayıt yok.","bos");d.colSpan=5;gov.appendChild(t);
+    }
+    v.harcamalar.forEach(function(h){
+      var tr=document.createElement("tr");
+      hucre(tr,h.tarih);hucre(tr,h.kategori);hucre(tr,h.aciklama||"");hucre(tr,h.tutar,"sayi");
+      var son=document.createElement("td");var b=document.createElement("button");
+      b.type="button";b.className="sil";b.textContent="Sil";
+      b.addEventListener("click",function(){sil(h.id);});
+      son.appendChild(b);tr.appendChild(son);gov.appendChild(tr);
+    });
+    mesaj("");
+  }catch(e){mesaj(e.message);}
+  rapor();
+}
+async function rapor(){
+  var gov=$("rapor");gov.textContent="";
+  var ay=$("f-ay").value;
+  if(!ay){$("rapor-ozet").textContent="Rapor için yukarıdan bir ay seçin.";return;}
+  try{
+    var r=await istek("/api/rapor?ay="+encodeURIComponent(ay));
+    $("rapor-ozet").textContent=r.ay+" genel toplam: "+r.genel_toplam;
+    r.satirlar.forEach(function(s){
+      var tr=document.createElement("tr");
+      hucre(tr,s.kategori);hucre(tr,s.tutar,"sayi");hucre(tr,"%"+s.yuzde,"sayi");gov.appendChild(tr);
+    });
+  }catch(e){mesaj(e.message);}
+}
+async function sil(id){
+  if(!confirm("Bu harcama silinsin mi?"))return;
+  try{await istek("/api/harcamalar/"+id,{method:"DELETE"});listele();}
+  catch(e){mesaj(e.message);}
+}
+$("ekle-formu").addEventListener("submit",async function(o){
+  o.preventDefault();
+  var f=new FormData(o.target);var g={};
+  f.forEach(function(d,k){if(String(d).trim()!=="")g[k]=String(d).trim();});
+  try{
+    await istek("/api/harcamalar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(g)});
+    o.target.reset();listele();
+  }catch(e){mesaj(e.message);}
+});
+$("filtrele").addEventListener("click",listele);
+var temalar=["otomatik","açık","koyu"];
+var tema=localStorage.getItem("tema")||"otomatik";
+function temaUygula(){
+  var k=document.documentElement;
+  if(tema==="otomatik")k.removeAttribute("data-tema");else k.setAttribute("data-tema",tema);
+  $("tema").textContent="Tema: "+tema;
+}
+$("tema").addEventListener("click",function(){
+  tema=temalar[(temalar.indexOf(tema)+1)%temalar.length];
+  localStorage.setItem("tema",tema);temaUygula();
+});
+temaUygula();
+listele();
+})();
+</script>
+</body>
+</html>
+"""
+
 
 class IstekHatasi(Exception):
     """HTTP durum kodu ile birlikte gönderilecek istemci hatası."""
@@ -143,6 +306,8 @@ class _Istekci(BaseHTTPRequestHandler):
             self._json(500, {"hata": "Beklenmeyen sunucu hatası."})
 
     def _islem(self, yontem: str, yol: str, sorgu: Dict[str, List[str]]) -> None:
+        if yol == "/" and yontem == "GET":
+            return self._sayfa()
         if yol == "/api/harcamalar":
             if yontem == "GET":
                 return self._listele(sorgu)
@@ -157,6 +322,9 @@ class _Istekci(BaseHTTPRequestHandler):
         raise IstekHatasi(404, "Bulunamadı.")
 
     # --- uç noktalar ---------------------------------------------------
+
+    def _sayfa(self) -> None:
+        self._yanit(200, "text/html; charset=utf-8", SAYFA_HTML.encode("utf-8"))
 
     def _listele(self, sorgu: Dict[str, List[str]]) -> None:
         ay = _sorgu_tek(sorgu, "ay")
